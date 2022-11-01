@@ -1,25 +1,107 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
-
+import DashBoard from '../views/admin/DashBoard.vue'
+import DataList from '../views/admin/DataList.vue'
+import store from '../store/index'
+import UserPage from '../views/UserPage.vue'
+import CatList from '../components/CatList.vue'
+import CatInfo from '../components/CatInfo.vue'
+import CatListPage from '../views/CatListPage.vue'
+import LandingPage from '../views/LandingPage.vue'
+import AboutUsPage from '../views/AboutUsPage.vue'
+import LoginPage from '../views/LoginPage.vue'
 const routes = [
   {
     path: '/',
-    name: 'home',
-    component: HomeView
+    component: LandingPage
   },
   {
-    path: '/about',
-    name: 'about',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/AboutView.vue')
+    path: '/aboutUs',
+    component: AboutUsPage
+  },
+  {
+    path: '/login',
+    component: LoginPage,
+    beforeEnter: (to, from, next) => {
+      if (store.state.isAuthenticated) {
+        if (store.state.currentUser.isAdmin) {
+          next({ path: '/admin/dashboard/datalist' })
+        } else {
+          next({ path: '/' })
+        }
+      } else {
+        next()
+      }
+    }
+  },
+  {
+    path: '/catList',
+    component: CatListPage,
+    children: [
+      {
+        path: '/catList/listPage',
+        component: CatList
+      },
+      {
+        path: '/catList/infoPage/:id',
+        component: CatInfo
+      }
+    ]
+  },
+  {
+    path: '/userPage',
+    component: UserPage,
+    beforeEnter: (to, from, next) => {
+      if (store.state.isAuthenticated) {
+        if (store.state.currentUser.isAdmin) {
+          next({ path: '/admin/dashboard' })
+        } else {
+          next()
+        }
+      } else {
+        next({ path: '/login' })
+      }
+    }
+  },
+  {
+    path: '/admin/dashboard',
+    component: DashBoard,
+    children:
+      [
+        {
+          path: 'datalist',
+          component: DataList
+        }
+      ],
+    beforeEnter: (to, from, next) => {
+      if (store.state.isAuthenticated) {
+        if (store.state.currentUser.isAdmin) {
+          next()
+        } else {
+          next({ path: '/' })
+        }
+      } else {
+        next({ path: '/login' })
+      }
+    }
+  },
+  {
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
   }
 ]
 
 const router = createRouter({
   history: createWebHashHistory(),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  if (store.state.isAuthenticated) {
+    store.dispatch('fetchCurrentUser')
+    next()
+  } else {
+    next()
+  }
 })
 
 export default router
