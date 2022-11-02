@@ -161,7 +161,7 @@ export default {
     fetchAnimalData () {
       const id = this.$route.params.id
       this.isLoading = true
-      this.$axiosHelper.get(`api/animalData/getDetail?id=${id}`)
+      this.$axiosHelper.get(`animalData/getDetail?id=${id}`)
         .then((obj) => {
           const { catData } = obj.data.responseData
           this.showCatData = { ...catData[0], shelter: { ...catData[0].shelter, shelter_lat: Number(catData[0].shelter.shelter_lat), shelter_lng: Number(catData[0].shelter.shelter_lng) } }

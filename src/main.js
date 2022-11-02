@@ -16,7 +16,7 @@ app.use(store)
 app.use(router)
 app.use(VueGoogleMaps, {
   load: {
-    key: process.env.MIX_API_KEY
+    key: process.env.VUE_APP_MIX_API_KEY
   },
   autobindAllEvents: false
 })

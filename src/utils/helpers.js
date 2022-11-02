@@ -1,13 +1,31 @@
 import axios from 'axios'
 import Swal from 'sweetalert2'
-
-const baseURL = process.env.API_URL
+import Cookies from 'js-cookie'
+const baseURL = `${process.env.VUE_APP_API_URL}api/`
 
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
+axios.defaults.headers.common.Authorization = localStorage.getItem('token') ? `Bearer ${JSON.parse(localStorage.getItem('token'))}` : ''
 export const axiosHelper = axios.create({
   baseURL,
-  headers: { withCredentials: true }
+  headers: {
+    withCredentials: true
+  }
 })
+
+const onRequest = (config) => {
+  if ((
+    config.method === 'post' ||
+    config.method === 'put' ||
+    config.method === 'delete') &&
+    !Cookies.get('XSRF-TOKEN')) {
+    axiosHelper.get('sanctum/csrf-cookie')
+  }
+  return config
+}
+
+axiosHelper.interceptors.request.use(onRequest, null)
+
+export default axiosHelper
 
 export const Toast = Swal.mixin({
   toast: true,

@@ -6,8 +6,7 @@ export default createStore({
       id: -1,
       name: '',
       email: '',
-      isAdmin: false,
-      token: ''
+      isAdmin: false
     },
     favoriteCats: [],
     isAuthenticated: false
@@ -28,11 +27,11 @@ export default createStore({
         id: -1,
         name: '',
         email: '',
-        isAdmin: false,
-        token: ''
+        isAdmin: false
       }
       state.favoriteCats = []
       state.isAuthenticated = false
+      localStorage.removeItem('token')
     },
     fetchCurrentUser (state) {
       axiosHelper('user/CurrentUser')
@@ -52,7 +51,8 @@ export default createStore({
       const { token } = value
       const { favoriteCats } = value.userData
       const { email, name, id, isAdmin } = value.userData.user
-      commit('setUser', { favoriteCats, user: { token, email, name, id, isAdmin } })
+      commit('setUser', { favoriteCats, user: { email, name, id, isAdmin } })
+      localStorage.setItem('token', JSON.stringify(token))
     },
     revokeAuthentication ({ commit }) {
       commit('revokeAuthentication')

@@ -96,7 +96,7 @@ export default {
           break
         }
         case 'filterData': {
-          this.$axiosHelper.get(`api/animalData/getFilter?animal_sex=${value.animal_sex}&animal_color=${value.animal_color}&shelter_city=${value.shelter_city}&shelter_name=${value.shelter_name}&haveImage=${value.haveImage}&screenSize=${this.screenSize}`)
+          this.$axiosHelper.get(`animalData/getFilter?animal_sex=${value.animal_sex}&animal_color=${value.animal_color}&shelter_city=${value.shelter_city}&shelter_name=${value.shelter_name}&haveImage=${value.haveImage}&screenSize=${this.screenSize}`)
             .then((obj) => {
               const { catData } = obj.data.responseData
               if (Array.isArray(catData)) {
@@ -124,7 +124,7 @@ export default {
           break
         }
         default: {
-          this.$axiosHelper.get(`api/animalData?screenSize=${this.screenSize}`)
+          this.$axiosHelper.get(`animalData?screenSize=${this.screenSize}`)
             .then((obj) => {
               const { catData, selectOption, shelterList } = obj.data.responseData
               this.catData.data = catData.data
