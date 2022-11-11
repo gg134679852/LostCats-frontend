@@ -1,9 +1,11 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import DashBoard from '../views/admin/DashBoard.vue'
-import DataList from '../views/admin/DataList.vue'
 import store from '../store/index'
 import UserPage from '../views/UserPage.vue'
 import CatList from '../components/CatList.vue'
+import AdminCatList from '../components/admin/AdminCatList.vue'
+import ShelterList from '../components/admin/ShelterList.vue'
+import DonateLog from '../components/admin/DonateLog.vue'
 import CatInfo from '../components/CatInfo.vue'
 import CatListPage from '../views/CatListPage.vue'
 import LandingPage from '../views/LandingPage.vue'
@@ -53,7 +55,7 @@ const routes = [
     beforeEnter: (to, from, next) => {
       if (store.state.isAuthenticated) {
         if (store.state.currentUser.isAdmin) {
-          next({ path: '/admin/dashboard' })
+          next({ path: '/admin/dashboard/catList' })
         } else {
           next()
         }
@@ -68,8 +70,16 @@ const routes = [
     children:
       [
         {
-          path: 'datalist',
-          component: DataList
+          path: 'catList',
+          component: AdminCatList
+        },
+        {
+          path: 'shelterList',
+          component: ShelterList
+        },
+        {
+          path: 'donateLog',
+          component: DonateLog
         }
       ],
     beforeEnter: (to, from, next) => {

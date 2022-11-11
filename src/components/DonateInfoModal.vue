@@ -86,6 +86,7 @@ export default {
     }
   },
   inject: ['Toast'],
+  emits: ['modalSwitcher', 'sendDonate', 'enterFormData'],
   data () {
     return ({
       modal: {}

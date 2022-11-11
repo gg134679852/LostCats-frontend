@@ -1,16 +1,6 @@
 <template>
-  <div class="text-star d-flex justify-content-between mt-3">
-    <div class="dropdown">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
-        aria-expanded="false">
-        資料選項
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-        <li><a class="dropdown-item" href="#" @click.prevent="componentSwitcher('CatList')">貓咪清單</a></li>
-        <li><a class="dropdown-item" href="#" @click.prevent="componentSwitcher('ShelterList')">收容所清單</a></li>
-        <li><a class="dropdown-item" href="#" @click.prevent="componentSwitcher('DonateLog')">捐獻紀錄</a></li>
-      </ul>
-    </div>
+  <loading-icon :active="isLoading" style="z-index: 1500;" />
+  <div class="text-star d-flex justify-content-end p-2">
     <div class="button-warp">
       <button type="button" class="btn btn-secondary"
         @click.prevent="switcher('none','createNewShelterData')">新增資料</button>
@@ -52,7 +42,8 @@
   <ShelterInfoModal
     :shelter-info-data="shelterInfoData" :shelter-info-modal-switcher="shelterInfoModalSwitcher"
     :modal-type="modalType"
-    :del-modal-type="delModalType" @upload-new-shelter-data="uploadNewShelterData"
+    :del-modal-type="delModalType"
+    @upload-new-shelter-data="uploadNewShelterData"
     @update-shelter-data="updateShelterData"
     @form-value-enter="formValueEnter"
     @switcher="switcher"
@@ -74,8 +65,12 @@ export default {
     DelModal
   },
   inject: ['Toast'],
+  created () {
+    this.fetchShelterData()
+  },
   data () {
     return ({
+      shelterData: [],
       shelterInfoData: {
         shelter_name: '',
         shelter_city: '0',
@@ -85,84 +80,19 @@ export default {
       shelterInfoModalSwitcher: 'hide',
       delModalSwitcher: 'hide',
       modalType: '',
-      delModalType: 'ShelterList'
+      delModalType: 'ShelterList',
+      screenSize: 'Big',
+      isLoading: false
     })
   },
-  props: {
-    currentComponent: {
-      type: String,
-      require: true
-    },
-    shelterData: {
-      type: Object,
-      require: true
-    }
-  },
-  emits: ['componentSwitcher', 'loadingSwitcher'],
   methods: {
-    componentSwitcher (type) {
-      this.$emit('componentSwitcher', type)
-    },
-    formValueEnter (key, value) {
-      this.shelterInfoData[key] = value
-    },
-    uploadNewShelterData () {
-      this.$emit('loadingSwitcher')
-      this.$axiosHelper.post('admin/shelterData/createNewShelterData', this.shelterInfoData)
+    fetchShelterData () {
+      this.isLoading = true
+      this.$axiosHelper.get(`animalData?screenSize=${this.screenSize}`)
         .then((obj) => {
-          this.Toast.fire({
-            icon: obj.data.icon,
-            title: obj.data.message
-          })
-          this.$emit('loadingSwitcher')
-        })
-        .catch((err) => {
-          if (err.response.data.errors) {
-            const errorMessage = err.response.data.errors
-            const objectKey = Object.keys(errorMessage)
-            objectKey.forEach((key) => {
-              return this.Toast.fire({
-                icon: 'warning',
-                title: `${errorMessage[key]}`
-              })
-            })
-            this.$emit('loadingSwitcher')
-          }
-        })
-    },
-    updateShelterData () {
-      this.$emit('loadingSwitcher')
-      this.$axiosHelper.put('admin/shelterData/updateShelterData', this.shelterInfoData)
-        .then((obj) => {
-          this.Toast.fire({
-            icon: obj.data.icon,
-            title: obj.data.message
-          })
-          this.$emit('loadingSwitcher')
-        })
-        .catch((err) => {
-          if (err.response.data.errors) {
-            const errorMessage = err.response.data.errors
-            const objectKey = Object.keys(errorMessage)
-            objectKey.forEach((key) => {
-              return this.Toast.fire({
-                icon: 'warning',
-                title: `${errorMessage[key]}`
-              })
-            })
-            this.$emit('loadingSwitcher')
-          }
-        })
-    },
-    deleteShelterData (id) {
-      this.$emit('loadingSwitcher')
-      this.$axiosHelper.delete(`admin/shelterData/deleteShelterData?id=${id}`)
-        .then((obj) => {
-          this.Toast.fire({
-            icon: obj.data.icon,
-            title: obj.data.message
-          })
-          this.$emit('loadingSwitcher')
+          const { shelterList } = obj.data.responseData
+          this.shelterData = shelterList
+          this.isLoading = false
         })
         .catch((err) => {
           this.Toast.fire({
@@ -170,7 +100,83 @@ export default {
             title: '發生錯誤，請查看開發者工具'
           })
           console.log(err)
-          this.$emit('loadingSwitcher')
+          this.isLoading = false
+        })
+    },
+    componentSwitcher (type) {
+      this.$emit('componentSwitcher', type)
+    },
+    formValueEnter (key, value) {
+      this.shelterInfoData[key] = value
+    },
+    uploadNewShelterData () {
+      this.isLoading = true
+      this.$axiosHelper.post('admin/shelterData/createNewShelterData', this.shelterInfoData)
+        .then((obj) => {
+          this.fetchShelterData()
+          this.Toast.fire({
+            icon: obj.data.icon,
+            title: obj.data.message
+          })
+          this.isLoading = false
+        })
+        .catch((err) => {
+          if (err.response.data.errors) {
+            const errorMessage = err.response.data.errors
+            const objectKey = Object.keys(errorMessage)
+            objectKey.forEach((key) => {
+              return this.Toast.fire({
+                icon: 'warning',
+                title: `${errorMessage[key]}`
+              })
+            })
+            this.isLoading = false
+          }
+        })
+    },
+    updateShelterData () {
+      this.isLoading = true
+      this.$axiosHelper.put('admin/shelterData/updateShelterData', this.shelterInfoData)
+        .then((obj) => {
+          this.fetchShelterData()
+          this.Toast.fire({
+            icon: obj.data.icon,
+            title: obj.data.message
+          })
+          this.isLoading = false
+        })
+        .catch((err) => {
+          if (err.response.data.errors) {
+            const errorMessage = err.response.data.errors
+            const objectKey = Object.keys(errorMessage)
+            objectKey.forEach((key) => {
+              return this.Toast.fire({
+                icon: 'warning',
+                title: `${errorMessage[key]}`
+              })
+            })
+            this.isLoading = false
+          }
+        })
+    },
+    deleteShelterData (id) {
+      this.isLoading = true
+      this.$axiosHelper.delete(`admin/shelterData/deleteShelterData?id=${id}`)
+        .then((obj) => {
+          this.fetchShelterData()
+          this.Toast.fire({
+            icon: obj.data.icon,
+            title: obj.data.message
+          })
+          this.isLoading = false
+        })
+        .catch((err) => {
+          this.Toast.fire({
+            icon: 'error',
+            title: '發生錯誤，請查看開發者工具'
+          })
+          console.log(err)
+          this.isLoading = false
         })
     },
     switcher (id, type) {

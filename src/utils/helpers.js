@@ -4,15 +4,16 @@ import Cookies from 'js-cookie'
 const baseURL = `${process.env.VUE_APP_API_URL}api/`
 
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-axios.defaults.headers.common.Authorization = localStorage.getItem('token') ? `Bearer ${JSON.parse(localStorage.getItem('token'))}` : ''
 export const axiosHelper = axios.create({
   baseURL,
   headers: {
-    withCredentials: true
+    withCredentials: true,
+    Accept: 'application/json'
   }
 })
 
 const onRequest = (config) => {
+  config.headers.Authorization = `Bearer ${JSON.parse(localStorage.getItem('token'))}`
   if ((
     config.method === 'post' ||
     config.method === 'put' ||

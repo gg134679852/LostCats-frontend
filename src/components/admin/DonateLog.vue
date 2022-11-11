@@ -1,17 +1,7 @@
 <template>
+  <loading-icon :active="isLoading" style="z-index: 1500;" />
   <div class="DonateLog__table__warp">
-    <div class="dropdown mt-2 mb-2">
-      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown"
-        aria-expanded="false">
-        資料選項
-      </button>
-      <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-        <li><a class="dropdown-item" href="#" @click.prevent="componentSwitcher('CatList')">貓咪清單</a></li>
-        <li><a class="dropdown-item" href="#" @click.prevent="componentSwitcher('ShelterList')">收容所清單</a></li>
-        <li><a class="dropdown-item" href="#" @click.prevent="componentSwitcher('DonateLog')">捐獻紀錄</a></li>
-      </ul>
-    </div>
-    <table class="table">
+    <table class="table mt-2">
       <thead>
         <tr>
           <th scope="col">款項編號</th>
@@ -22,7 +12,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(item,index) in donateLogData.data" :key="index">
+        <tr v-for="(item,index) in donateLog.data" :key="index">
           <td>{{item.order_Id}}</td>
           <td>{{item.user_id}}</td>
           <td>{{item.donate_price}}</td>
@@ -33,9 +23,9 @@
     </table>
   </div>
   <PaginationComponent
-  :screen-size="screenSize"
-  :paginationLinks="donateLogData.paginationLinks"
-  @fetch-animal-data="fetchAnimalData"
+    :screen-size="screenSize"
+    :paginationLinks="donateLog.paginationLinks"
+    @fetch-animal-data ="fetchAnimalData"
   />
 </template>
 <script>
@@ -44,18 +34,78 @@ export default {
   components: {
     PaginationComponent
   },
-  props: {
-    donateLogData: {
-      type: Object,
-      required: true
-    },
-    screenSize: {
-      type: String,
-      required: true
-    }
+  created () {
+    this.fetchAnimalData()
   },
-  emits: ['componentSwitcher', 'fetchAnimalData'],
+  data () {
+    return ({
+      donateLog: {
+        data: [],
+        paginationLinks: []
+      },
+      isLoading: false,
+      screenSize: 'Big'
+    })
+  },
+  inject: ['Toast'],
   methods: {
+    fetchAnimalData (type, value) {
+      this.isLoading = true
+      switch (type) {
+        case 'pageClick': {
+          this.$axiosHelper.get(value)
+            .then((obj) => {
+              const { catData } = obj.data.responseData
+              if (Array.isArray(catData)) {
+                this.catData.data = catData.data
+              } else {
+                this.catData.data = Object.values(catData.data)
+              }
+              this.catData.paginationLinks = {
+                links: catData.links,
+                currentPage: catData.current_page,
+                prevPageUrl: catData.prev_page_url,
+                nextPageUrl: catData.next_page_url,
+                lastPage: catData.last_page
+              }
+              this.isLoading = false
+            })
+            .catch((err) => {
+              this.Toast.fire({
+                icon: 'error',
+                title: '發生錯誤，請查看開發者工具'
+              })
+              console.log(err)
+              this.isLoading = false
+            })
+          break
+        }
+        default: {
+          this.$axiosHelper.get('admin/donateLogData')
+            .then((obj) => {
+              const { donateLog } = obj.data
+              this.donateLog.data = donateLog.data
+              this.donateLog.paginationLinks = {
+                links: donateLog.links,
+                currentPage: donateLog.current_page,
+                prevPageUrl: donateLog.prev_page_url,
+                nextPageUrl: donateLog.next_page_url,
+                lastPage: donateLog.last_page
+              }
+              this.isLoading = false
+            })
+            .catch((err) => {
+              this.Toast.fire({
+                icon: 'error',
+                title: '發生錯誤，請查看開發者工具'
+              })
+              console.log(err)
+              this.isLoading = false
+            })
+          break
+        }
+      }
+    },
     componentSwitcher (type) {
       this.$emit('componentSwitcher', type)
     }

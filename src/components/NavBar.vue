@@ -1,4 +1,32 @@
 <template>
+  <template v-if="this.$store.state.isAuthenticated && this.$store.state.currentUser.isAdmin === 1">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">管理者後台</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+          aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link" href="#" @click.prevent="linkClick('/admin/dashboard/catList')">喵星人清單</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" @click.prevent="linkClick('/admin/dashboard/shelterList')">收容所清單</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" @click.prevent="linkClick('/admin/dashboard/donateLog')">捐款清單</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#" @click.prevent="logout">登出</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </template>
+  <template v-else>
   <nav class="navbar__wrap">
     <div class="navbar__web-name" @click.prevent="linkClick('/')">
       <h3 class="navbar-brand__title">
@@ -43,6 +71,7 @@
       </ul>
     </div>
   </nav>
+  </template>
 </template>
 <script>
 export default {

@@ -24,9 +24,9 @@
               <img class="img-fluid" :src="catInfoData.album_file" alt="">
             </div>
             <div class="col-sm-8">
-              <div class="mb-3" v-if="modalType === 'updateCatData'">
-                <label for="animal_id" class="form-label">編號</label>
-                <input type="text" class="form-control" id="animal_id" placeholder="請輸入編號"            @input="passValue" :value="catInfoData.animal_id">
+              <div class="mb-3">
+                <label for="animal_subid" class="form-label">晶片號碼</label>
+                <input type="text" class="form-control" id="animal_subid" placeholder="請輸入晶片號碼"            @input="passValue" :value="catInfoData.animal_subid">
               </div>
               <div class="row gx-2">
                 <div class="mb-3 col-md-6">

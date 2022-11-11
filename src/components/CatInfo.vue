@@ -3,8 +3,7 @@
   <div class="detailPage__wrap container" v-if="isLoading === false">
     <div class="detailPage__catInfo">
       <div class="detailPage__catInfo__img">
-        <img class="rounded-3" :src="showCatData.album_file"
-          onerror="this.src='https://via.placeholder.com/200x200?text=NO+IMAGE'" />
+        <img class="rounded-3" :src="showCatData.album_file === null ? 'https://via.placeholder.com/200x200?text=NO+IMAGE' : showCatData.album_file" />
       </div>
       <div class="detailPage__catInfo__content">
         <div class="detailPage__catInfo__content__text__id">
@@ -43,7 +42,7 @@
           </div>
         </div>
         <div class="detailPage__catInfo__buttonGroup">
-          <button type="button" class="btn btn-secondary" @click.stop.prevent="adoptionLink"><i
+          <button type="button" class="btn btn-secondary" @click.stop.prevent="adoptionLink" v-if="showCatData.isFake === 0"><i
               class="fas fa-home"></i>領養</button>
           <template v-if="this.$store.state.isAuthenticated">
             <button type="button" class="btn btn-secondary" @click="modalSwitcher"><i
@@ -56,7 +55,7 @@
         </div>
       </div>
     </div>
-    <template v-if="showCatData.animal_remark.length > 0">
+    <template v-if="showCatData.animal_remark !== null && showCatData.animal_remark.length !== 0">
       <div class="detailPage__catInfo__content__text__remark">
         <h3>註記:</h3>
         <h2>{{ showCatData.animal_remark }}</h2>
@@ -87,8 +86,10 @@
     </div>
   </div>
   <DonateInfoModal
-    :screen-size="screenSize" :donate-info-modal-switcher="donateInfoModalSwitcher"
-    :shelter-name="showCatData.shelter.shelter_name" :donate-info="donateInfo" :trade-data="tradeData"
+    :screen-size="screenSize"
+    :donate-info-modal-switcher="donateInfoModalSwitcher"
+    :shelter-name="showCatData.shelter.shelter_name"
+    :donate-info="donateInfo" :trade-data="tradeData"
     :is-transaction="isTransaction" @modal-switcher="modalSwitcher" @enter-form-data="enterFormData"
     @send-donate="sendDonate" />
 </template>

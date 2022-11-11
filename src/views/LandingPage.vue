@@ -21,7 +21,7 @@
       </li>
       <li>
         <div class="benefit-content__image">
-          <img src="`../../public/img/carolina-sanchez-Lh_TJTQVPjM-unsplash.jpg" alt="喵星人與人類">
+          <img src="../../public/img/carolina-sanchez-Lh_TJTQVPjM-unsplash.jpg" alt="喵星人與人類">
         </div>
         <div class="benefit-content__text">
           <div class="benefit-content__text__wrap">
